@@ -39,7 +39,7 @@ omx.express = function(req, res, next) {
 	next();
 };
 
-omx.start = function(fn, callback) {
+omx.start = function(moviePathName) {
 	if (this._proc) {
 		return callback("Please stop");
 	}
@@ -49,39 +49,29 @@ omx.start = function(fn, callback) {
 		exec('mkfifo ' + pipe);
 		this._pipe = pipe;
 	}
-	var map = this._map;
-	if (map) {
-		map(fn, cb);
-	} else {
-		cb(fn);
-	}
+	var cmd = 'omxplayer ' + commandParameters.join(" ") + ' "' + moviePathName + '" < ' + pipe;
+	console.log("Command=", cmd);
+	var p = exec(cmd, function(error, stdout, stderr) {
+		if (error) {
+			console.error(error);
+			return;
+		}
 
-	var self = this;
-	function cb(fn) {
-		var cmd = 'omxplayer ' + commandParameters.join(" ") + ' "' + fn + '" < ' + pipe;
-		console.log("Command=", cmd);
-		var p = exec(cmd, function(error, stdout, stderr) {
-			if (error) {
-				console.error(error);
-				return;
-			}
+		if (stdout) {
+			console.log(stdout);
+		}
+		if (stderr) {
+			console.error(stderr);
+		}
+	});
+	self._proc = p;
 
-			if (stdout) {
-				console.log(stdout);
-			}
-			if (stderr) {
-				console.error(stderr);
-			}
-		});
-		self._proc = p;
+	p.on("close", function() {
+		self._proc = null;
+		console.log("Process closed");
+	});
 
-		p.on("close", function() {
-			self._proc = null;
-			console.log("Process closed");
-		});
-
-		exec('echo . > ' + pipe);
-	}
+	exec('echo . > ' + pipe);
 };
 
 omx.sendKey = function(key) {
