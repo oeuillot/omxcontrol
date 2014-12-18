@@ -49,6 +49,9 @@ omx.start = function(moviePathName) {
 		exec('mkfifo ' + pipe);
 		this._pipe = pipe;
 	}
+
+	var self = this;
+
 	var cmd = 'omxplayer ' + commandParameters.join(" ") + ' "' + moviePathName + '" < ' + pipe;
 	console.log("Command=", cmd);
 	var p = exec(cmd, function(error, stdout, stderr) {
@@ -64,7 +67,7 @@ omx.start = function(moviePathName) {
 			console.error(stderr);
 		}
 	});
-	self._proc = p;
+	this._proc = p;
 
 	p.on("close", function() {
 		self._proc = null;
