@@ -12,6 +12,8 @@ function omx(configuration, mapper) {
 	return omx.express;
 }
 
+// 192.168.0.128:8080/omx/start/Films/Barbapapa/Barbapapa+-+Le+facteur.mkv
+
 omx.express = function(req, res, next) {
 	if (req.path.indexOf(DEFAULT_PATH) === 0) {
 		// replace + and decode
@@ -37,7 +39,10 @@ omx.express = function(req, res, next) {
 	next();
 };
 
-omx.start = function(fn) {
+omx.start = function(fn, callback) {
+	if (this._proc) {
+		return callback("Please stop");
+	}
 	var pipe = this._pipe;
 	if (!pipe) {
 		pipe = TMP_PATH + 'omxcontrol-' + (Date.now());
@@ -51,13 +56,30 @@ omx.start = function(fn) {
 		cb(fn);
 	}
 
+	var self = this;
 	function cb(fn) {
 		var cmd = 'omxplayer ' + commandParameters.join(" ") + ' "' + fn + '" < ' + pipe;
 		console.log("Command=", cmd);
-		exec(cmd, function(error, stdout, stderr) {
-			if (error)
+		var p = exec(cmd, function(error, stdout, stderr) {
+			if (error) {
 				console.error(error);
+				return;
+			}
+
+			if (stdout) {
+				console.log(stdout);
+			}
+			if (stderr) {
+				console.error(stderr);
+			}
 		});
+		self._proc = p;
+
+		p.on("close", function() {
+			self._proc = null;
+			console.log("Process closed");
+		});
+
 		exec('echo . > ' + pipe);
 	}
 };
@@ -66,7 +88,12 @@ omx.sendKey = function(key) {
 	if (!this._pipe) {
 		return;
 	}
-	exec('echo -n ' + key + ' > ' + this._pipe);
+	exec('echo -n ' + key + ' > ' + this._pipe, function(error, stdout, stderr) {
+		if (error) {
+			console.error(error);
+			return;
+		}
+	});
 };
 
 omx.mapKey = function(command, key, then) {
