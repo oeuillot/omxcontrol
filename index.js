@@ -29,7 +29,7 @@ omx.express = function(req, res, next) {
 		var path = MOVIES_PATH + parts.join('/');
 		console.log('executing', command, parts);
 		if (omx[command]) {
-			omx[command].call(this, path, function(error) {
+			omx[command].call(omx, path, function(error) {
 
 				res.writeHead(200, {
 					'Content-Type': 'application/json',
