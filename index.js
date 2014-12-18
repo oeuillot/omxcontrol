@@ -4,6 +4,7 @@ var parseurl = require('url');
 var DEFAULT_PATH = '/omx';
 var TMP_PATH = "/tmp/";
 var commandParameters = [ "-b" ];
+var MOVIES_PATH = "/home/olivier/Films/";
 
 function omx(configuration, mapper) {
 	this.configuration = configuration;
@@ -24,7 +25,7 @@ omx.express = function(req, res, next) {
 		console.log('executing', command, parts);
 		if (omx[command]) {
 			if (command === 'start') {
-				omx.start(parts.join('/') + '?' + parseurl.parse(req.url).query);
+				omx.start(MOVIES_PATH + parts.join('/'));
 			} else {
 				omx[command].apply(this, parts);
 			}
@@ -43,7 +44,7 @@ omx.start = function(fn) {
 		exec('mkfifo ' + pipe);
 		this._pipe = pipe;
 	}
-	var map=this._map;
+	var map = this._map;
 	if (map) {
 		map(fn, cb);
 	} else {
@@ -51,9 +52,11 @@ omx.start = function(fn) {
 	}
 
 	function cb(fn) {
-		console.log(fn);
-		exec('omxplayer ' + commandParameters.join(" ") + ' ' + fn + '" < ' + pipe, function(error, stdout, stderr) {
-			console.log(stdout);
+		var cmd = 'omxplayer ' + commandParameters.join(" ") + ' "' + fn + '" < ' + pipe;
+		console.log("Command=", cmd);
+		exec(cmd, function(error, stdout, stderr) {
+			if (error)
+				console.error(error);
 		});
 		exec('echo . > ' + pipe);
 	}
