@@ -43,6 +43,7 @@ omx.start = function(fn) {
 		exec('mkfifo ' + pipe);
 		this._pipe = pipe;
 	}
+	var map=this._map;
 	if (map) {
 		map(fn, cb);
 	} else {
