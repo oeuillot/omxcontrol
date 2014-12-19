@@ -120,6 +120,8 @@ omx.prototype.start = function(moviePathName, callback) {
 	p.on("close", function() {
 		self._proc = null;
 		console.log("Process closed");
+
+		self._release();
 	});
 
 	exec('echo . > ' + pipe);
@@ -159,7 +161,7 @@ omx.prototype._mapKey = function(command, key, then) {
 omx.prototype._release = function() {
 	console.log("Release pipe");
 	if (this._pipe) {
-		// fs.unlink(this._pipe);
-		// this._pipe = null;
+		fs.unlink(this._pipe);
+		this._pipe = null;
 	}
 }
