@@ -93,7 +93,7 @@ omx.start = function(moviePathName, callback) {
 };
 
 omx.sendKey = function(key, callback) {
-	if (!this._pipe) {
+	if (!this._proc) {
 		return callback("No process");
 	}
 	exec('echo -n ' + key + ' > ' + this._pipe, function(error, stdout, stderr) {
