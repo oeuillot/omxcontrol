@@ -24,7 +24,7 @@ function omx(configuration) {
 	var self = this;
 	this._mapKey('pause', 'p');
 	this._mapKey('quit', 'q', function(callback) {
-		self._release();
+		self._proc = null;
 		return callback(null);
 	});
 	this._mapKey('play', '.');
