@@ -75,6 +75,10 @@ omx.prototype._express = function(req, res, next) {
 	next();
 };
 
+omx.prototype.status = function(path, callback) {
+	return callback(null);
+}
+
 omx.prototype.start = function(moviePathName, callback) {
 	if (this._proc) {
 		return callback("Please stop");
