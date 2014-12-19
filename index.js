@@ -45,7 +45,7 @@ omx.prototype._express = function(req, res, next) {
 		// remove leading and trailing /
 		path = path.replace(/^\/|\/$/g, '');
 		// split and remove leading path
-		
+
 		var parts = path.split('/');
 		var command = parts.shift();
 		var path = this._moviesPath + '/' + parts.join('/');
@@ -137,8 +137,9 @@ omx.prototype.sendKey = function(key, callback) {
 };
 
 omx.prototype._mapKey = function(command, key, then) {
-	omx[command] = function(path, callback) {
-		omx.sendKey(key, function(error) {
+	var self = this;
+	this[command] = function(path, callback) {
+		self.sendKey(key, function(error) {
 			if (error) {
 				return callback(error);
 			}
