@@ -39,16 +39,17 @@ module.exports = omx;
 omx.prototype._express = function(req, res, next) {
 	if (req.path.indexOf(this._omxPath) === 0) {
 		// replace + and decode
-		path = path.substring(this._omxPath.length);
+		var path = req.path.substring(this._omxPath.length);
 
-		path = decodeURIComponent(req.path.replace(/\+/g, ' '));
-
+		path = decodeURIComponent(path.replace(/\+/g, ' '));
 		// remove leading and trailing /
 		path = path.replace(/^\/|\/$/g, '');
 		// split and remove leading path
+		
 		var parts = path.split('/');
 		var command = parts.shift();
 		var path = this._moviesPath + '/' + parts.join('/');
+
 		if (this[command]) {
 			console.log('executing', command, parts);
 			this[command].call(this, path, function(error) {
