@@ -7,7 +7,7 @@ var NO_CACHE_CONTROL = "no-cache, private, no-store, must-revalidate, max-stale=
 var OMX_PATH = '/omx';
 var TMP_PATH = "/tmp";
 var COMMAND_PARAMETERS = [ "-b" ];
-var MOVIES_PATH = "/home/olivier/Films";
+var MOVIES_PATH = "/tmp";
 
 // 192.168.0.128:8080/omx/start/Barbapapa/Barbapapa+-+Le+facteur.mkv
 
@@ -157,8 +157,9 @@ omx.prototype._mapKey = function(command, key, then) {
 };
 
 omx.prototype._release = function() {
+	console.log("Release pipe");
 	if (this._pipe) {
-		fs.unlink(this._pipe);
-		this._pipe = null;
+		// fs.unlink(this._pipe);
+		// this._pipe = null;
 	}
 }
