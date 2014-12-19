@@ -50,6 +50,7 @@ omx.prototype._express = function(req, res, next) {
 		var command = parts.shift();
 		var path = this._moviesPath + '/' + parts.join('/');
 
+		var self = this;
 		if (this[command]) {
 			console.log('executing', command, parts);
 			this[command].call(this, path, function(error) {
@@ -60,11 +61,10 @@ omx.prototype._express = function(req, res, next) {
 				});
 
 				if (error) {
-					res.end('{ "returnCode": "ERROR", "message": "' + error + '"}');
+					res.end('{ "returnCode": "ERROR", "message": "' + error + '", "processing": ' + (!!self._proc) + '}');
 					return;
 				}
-				res.end('{ "returnCode": "OK" }');
-
+				res.end('{ "returnCode": "OK", "processing": ' + (!!self._proc) + ' }');
 			});
 			return;
 		}
@@ -123,7 +123,7 @@ omx.prototype.start = function(moviePathName, callback) {
 	return callback(null);
 };
 
-omx.prototype.sendKey = function(key, callback) {
+omx.prototype._sendKey = function(key, callback) {
 	if (!this._proc) {
 		return callback("No process");
 	}
@@ -139,7 +139,7 @@ omx.prototype.sendKey = function(key, callback) {
 omx.prototype._mapKey = function(command, key, then) {
 	var self = this;
 	this[command] = function(path, callback) {
-		self.sendKey(key, function(error) {
+		self._sendKey(key, function(error) {
 			if (error) {
 				return callback(error);
 			}
